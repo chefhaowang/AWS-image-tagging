@@ -1,7 +1,5 @@
-# Image-Tagging-AWS-WebService
 This is the project for building AWS service for a image storing and tagging application.
 
-Contributed by FIT5225 Team-67
 
 Here is what we have on in the root:
 1. lambda: store all related lambda func and related files

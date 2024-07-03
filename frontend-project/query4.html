@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query 4</title>
+    <style>
+        .container {
+            position: relative;
+            left: 40%;
+            transform: translateX(-50%);
+            top: 100px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        textarea {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+
+        select {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #status {
+            margin-top: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Image storage & detection web service - Team 67</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="upload-image.html">Image Upload</a></li>
+                <li class="nav-item"><a class="nav-link" href="query1.html">Query 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="query2.html">Query 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="query3.html">Query 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="query4.html">Query 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="query5.html">Query 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="set-special-tags.html">Set Tags</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Query 4</h2>
+        <form id="tag-form">
+            <label for="urls">Image URLs (comma-separated):</label>
+            <textarea id="urls" required></textarea>
+            
+            <label for="tags">Tags (comma-separated):</label>
+            <input type="text" id="tags" required>
+            
+            <label for="type">Action:</label>
+            <select id="type" required>
+                <option value="1">Add Tags</option>
+                <option value="0">Remove Tags</option>
+            </select>
+            
+            <button type="submit">Submit</button>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tagForm = document.getElementById('tag-form');
+            const statusDiv = document.getElementById('status');
+    
+            tagForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+    
+                const urls = document.getElementById('urls').value.split(',').map(url => url.trim());
+                const tags = document.getElementById('tags').value.split(',').map(tag => tag.trim());
+                const type = parseInt(document.getElementById('type').value);
+                const userid = localStorage.getItem('email') || "wh.tenghe@gmail.com";
+    
+                const jsonPayload = {
+                    user_id: userid,
+                    thumbnail_url: urls,
+                    type: type,
+                    tags: tags
+                };
+    
+                try {
+                    const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/addremovetags', {
+                        method: 'POST',
+                        headers: {
+                            //'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonPayload)
+                    });
+    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Request Success', result);
+                        statusDiv.innerText = 'Request successful!';
+                    } else {
+                        console.error('Request failed', response);
+                        statusDiv.innerText = 'Request failed.';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    statusDiv.innerText = 'Request failed.';
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

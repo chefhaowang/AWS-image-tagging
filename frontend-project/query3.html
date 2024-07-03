@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query 3</title>
+    <style>
+
+        .upload-container {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 100px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+
+        button {
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #upload-status {
+            margin-top: 20px;
+        }
+
+        #image-container {
+            position: relative;
+            top: 100px;
+            max-height: 200px;
+            width: 100%;
+            padding: 0 300px;
+            overflow: auto;
+        }
+
+        #image-container img {
+            margin-left: 50px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Image storage & detection web service - Team 67</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="upload-image.html">Image Upload</a></li>
+            <li class="nav-item"><a class="nav-link" href="query1.html">Query 1</a></li>
+            <li class="nav-item"><a class="nav-link" href="query2.html">Query 2</a></li>
+            <li class="nav-item"><a class="nav-link" href="query3.html">Query 3</a></li>
+            <li class="nav-item"><a class="nav-link" href="query4.html">Query 4</a></li>
+            <li class="nav-item"><a class="nav-link" href="query5.html">Query 5</a></li>
+            <li class="nav-item"><a class="nav-link" href="set-special-tags.html">Set Tags</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div id="upload-container" class="upload-container">
+    <h2>Find images based on the tags of an image</h2>
+    <form id="upload-form">
+        <input type="file" id="image-input" accept="image/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="upload-status"></div>
+</div>
+<div id="image-container">
+    <h2>Found Image List:</h2>
+    <div id="inner-image-container"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const uploadForm = document.getElementById('upload-form');
+        const uploadStatus = document.getElementById('upload-status');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const imageInput = document.getElementById('image-input');
+            const file = imageInput.files[0];
+
+
+            const userId = localStorage.getItem('email') || "wh.tenghe@gmail.com"; // Replace this with actual email retrieval
+
+            if (file) {
+                let imgContainer = document.getElementById('inner-image-container')
+                imgContainer.innerHTML = ''
+
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+                    const jsonPayload = {
+                        user_email: userId,
+                        image: base64String
+                    };
+
+                    try {
+                        const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/imagebasedonimage', {
+                            method: 'POST',
+                            headers: {
+                                //'Content-Type': 'application/json',
+                            },
+
+                            body: JSON.stringify(jsonPayload)
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            console.log('Upload Success', result);
+                            uploadStatus.innerText = 'Upload successful!';
+
+                            const responseData = result.matching_thumbnails
+                            if (responseData && responseData.length > 0) {
+                                responseData.forEach((url, index) => {
+                                    let imgContainer = document.getElementById('inner-image-container')
+                                    let img = document.createElement('img')
+                                    img.src = url
+                                    img.width = 200;
+                                    img.height = 200;
+                                    imgContainer.appendChild(img)
+                                    console.log('img-', img)
+                                })
+                            }
+                        } else {
+                            console.error('Upload failed', response);
+                            uploadStatus.innerText = 'Upload failed.';
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        uploadStatus.innerText = 'Upload failed.';
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select an image file to upload.');
+            }
+        });
+    });
+
+
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

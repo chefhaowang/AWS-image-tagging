@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query 1</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 22px);
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #query-status {
+            margin-top: 20px;
+        }
+
+        #signOutBtn {
+            position: absolute;
+            right: 50px;
+            top: 50px;
+        }
+
+        .image-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            /* Ensure images are listed vertically */
+            gap: 10px;
+            /* Add gaps between images */
+        }
+
+        .image-list img {
+            max-width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            /* Add cursor pointer for clickable images */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Image storage & detection web service - Team 67</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="upload-image.html">Image Upload</a></li>
+                <li class="nav-item"><a class="nav-link" href="query1.html">Query 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="query2.html">Query 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="query3.html">Query 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="query4.html">Query 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="query5.html">Query 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="set-special-tags.html">Set Tags</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div id="query-container" class="container">
+        <h2>Query Based on Tags</h2>
+        <form id="query-form">
+            <div id="tags-container">
+                <div class="form-group">
+                    <label for="tag-1">Tag</label>
+                    <input type="text" id="tag-1" name="tag-1" placeholder="Enter tag" required>
+                    <label for="amount-1">Amount</label>
+                    <input type="number" id="amount-1" name="amount-1" placeholder="Enter amount" required>
+                </div>
+            </div>
+            <button type="button" id="add-tag-btn">Add Another Tag</button>
+            <button type="submit">Submit Query</button>
+        </form>
+        <div id="query-status"></div>
+        <div class="image-list" id="image-list"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const queryForm = document.getElementById('query-form');
+            const queryStatus = document.getElementById('query-status');
+            const tagsContainer = document.getElementById('tags-container');
+            const addTagBtn = document.getElementById('add-tag-btn');
+            const imageList = document.getElementById('image-list');
+            let tagCount = 1;
+
+            addTagBtn.addEventListener('click', () => {
+                tagCount++;
+                const formGroup = document.createElement('div');
+                formGroup.classList.add('form-group');
+                formGroup.innerHTML = `
+                <label for="tag-${tagCount}">Tag</label>
+                <input type="text" id="tag-${tagCount}" name="tag-${tagCount}" placeholder="Enter tag" required>
+                <label for="amount-${tagCount}">Amount</label>
+                <input type="number" id="amount-${tagCount}" name="amount-${tagCount}" placeholder="Enter amount" required>
+            `;
+                tagsContainer.appendChild(formGroup);
+            });
+
+            // const userId = localStorage.getItem('email');
+            // if (!userId) {
+            //     alert('User is not logged in.');
+            //     return
+            // }
+            const userId = localStorage.getItem('email') || "wh.tenghe@gmail.com"; // Replace this with actual email retrieval
+
+            queryForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+
+                const tags = {};
+                for (let i = 1; i <= tagCount; i++) {
+                    const tag = document.getElementById(`tag-${i}`).value;
+                    const amount = document.getElementById(`amount-${i}`).value;
+                    if (tag && amount) {
+                        tags[tag] = parseInt(amount, 10);
+                    }
+                }
+
+                console.log(tags)
+                const jsonPayload = {
+                    user_id: userId,
+                    tags: tags
+                };
+
+                console.log(jsonPayload)
+
+                try {
+                    const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/imagebasedontags', {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonPayload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Query Success', result);
+                        queryStatus.innerText = 'Query successful!';
+                        displayImages(result.links);
+                    } else {
+                        console.error('Query failed', response);
+                        queryStatus.innerText = 'Query failed.';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    queryStatus.innerText = 'Query failed.';
+                }
+            });
+
+            function displayImages(links) {
+                imageList.innerHTML = '';
+                links.forEach(link => {
+                    const img = document.createElement('img');
+                    img.src = link;
+                    img.alt = 'Image';
+                    img.onclick = () => fetchFullSizeImage(link);
+                    imageList.appendChild(img);
+                });
+            }
+
+            async function fetchFullSizeImage(thumbnailUrl) {
+                const jsonPayload = {
+                    user_id: userId,
+                    thumbnail_url: thumbnailUrl
+                };
+
+                try {
+                    const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/searchthroughthumbnailurl', {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonPayload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Full-size image URL retrieved', result);
+                        window.open(result.image_url, '_blank');
+                    } else {
+                        console.error('Failed to retrieve full-size image URL', response);
+                    }
+                } catch (error) {
+                    console.error('Error fetching full-size image URL:', error);
+                }
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

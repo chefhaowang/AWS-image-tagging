@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query 5</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        #response-message {
+            margin-top: 20px;
+            word-wrap: break-word;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Image storage & detection web service - Team 67</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="upload-image.html">Image Upload</a></li>
+                <li class="nav-item"><a class="nav-link" href="query1.html">Query 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="query2.html">Query 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="query3.html">Query 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="query4.html">Query 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="query5.html">Query 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="set-special-tags.html">Set Tags</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Query 5</h2>
+        <form id="delete-urls-form">
+            <div id="urls-container">
+                <div class="form-group">
+                    <label for="url-1">Thumbnail Image URL</label>
+                    <input type="text" id="url-1" name="url-1" class="form-control"
+                        placeholder="Enter thumbnail image URL" required>
+                </div>
+            </div>
+            <button type="button" id="add-url-btn" class="btn btn-secondary">Add Another URL</button>
+            <button type="submit" class="btn btn-primary">Delete Images</button>
+        </form>
+        <div id="response-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const deleteUrlsForm = document.getElementById('delete-urls-form');
+            const responseMessageDiv = document.getElementById('response-message');
+            const urlsContainer = document.getElementById('urls-container');
+            const addUrlBtn = document.getElementById('add-url-btn');
+            let urlCount = 1;
+
+            addUrlBtn.addEventListener('click', () => {
+                urlCount++;
+                const formGroup = document.createElement('div');
+                formGroup.classList.add('form-group');
+                formGroup.innerHTML = `
+                    <label for="url-${urlCount}">Thumbnail Image URL</label>
+                    <input type="text" id="url-${urlCount}" name="url-${urlCount}" class="form-control" placeholder="Enter thumbnail image URL" required>
+                `;
+                urlsContainer.appendChild(formGroup);
+            });
+
+            deleteUrlsForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const urls = [];
+                for (let i = 1; i <= urlCount; i++) {
+                    const url = document.getElementById(`url-${i}`).value;
+                    if (url) {
+                        urls.push(url);
+                    }
+                }
+
+                const userId = localStorage.getItem('email') || "wh.tenghe@gmail.com"; // Replace this with actual email retrieval
+
+                const jsonPayload = {
+                    user_id: userId,
+                    thumbnail_urls: urls
+                };
+
+                try {
+                    const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/deleteimage', {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonPayload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.text();
+                        console.log('Deletion Success', result);
+                        responseMessageDiv.innerText = 'Images and thumbnails deleted successfully from DynamoDB and bucket';
+                    } else {
+                        console.error('Deletion failed', response);
+                        responseMessageDiv.innerText = 'Deletion failed.';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    responseMessageDiv.innerText = 'Deletion failed.';
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

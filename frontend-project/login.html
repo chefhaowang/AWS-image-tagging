@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .sign-in {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        button {
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sign-in">
+        <button id="signInBtn">Sign In</button>
+    </div>
+
+    <script>
+        localStorage.removeItem('id_token');
+        localStorage.removeItem('access_token');
+
+        let signIn = document.getElementById('signInBtn');
+        signIn.addEventListener('click', function () {
+            window.location = 'https://fit5225ass3-67.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=49u0mrhvgb0nbdedslmbrkn1k6&response_type=token&scope=email+openid&redirect_uri=https%3A%2F%2Ffrontend-bucket-67.s3.amazonaws.com%2Findex.html'
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

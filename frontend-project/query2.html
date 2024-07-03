@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query 2</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        #fullsize-image-url {
+            margin-top: 20px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Image storage & detection web service - Team 67</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="upload-image.html">Image Upload</a></li>
+                <li class="nav-item"><a class="nav-link" href="query1.html">Query 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="query2.html">Query 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="query3.html">Query 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="query4.html">Query 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="query5.html">Query 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="set-special-tags.html">Set Tags</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Query 2</h2>
+        <form id="thumbnail-query-form">
+            <div class="form-group">
+                <label for="thumbnail-url">Thumbnail Image URL</label>
+                <input type="text" id="thumbnail-url" class="form-control" placeholder="Enter thumbnail image URL"
+                    required>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div id="fullsize-image-url"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const thumbnailQueryForm = document.getElementById('thumbnail-query-form');
+            const fullsizeImageUrlDiv = document.getElementById('fullsize-image-url');
+
+            thumbnailQueryForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const thumbnailUrl = document.getElementById('thumbnail-url').value;
+
+                // const userId = localStorage.getItem('email');
+                // if (!userId) {
+                //     alert('User is not logged in.');
+                //     return
+                // }
+                const userId = localStorage.getItem('email') || "wh.tenghe@gmail.com"; // Replace this with actual email retrieval
+
+                const jsonPayload = {
+                    user_id: userId,
+                    thumbnail_url: thumbnailUrl
+                };
+
+                try {
+                    const response = await fetch('https://96uj8n8uji.execute-api.us-east-1.amazonaws.com/api/queries/searchthroughthumbnailurl', {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonPayload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Full-size image URL retrieved', result);
+                        fullsizeImageUrlDiv.innerHTML = `<a href="${result.image_url}" target="_blank">${result.image_url}</a>`;
+                    } else {
+                        console.error('Failed to retrieve full-size image URL', response);
+                        fullsizeImageUrlDiv.innerText = 'Failed to retrieve full-size image URL.';
+                    }
+                } catch (error) {
+                    console.error('Error fetching full-size image URL:', error);
+                    fullsizeImageUrlDiv.innerText = 'Error fetching full-size image URL.';
+                }
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

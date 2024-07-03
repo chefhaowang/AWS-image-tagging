@@ -1,0 +1,8 @@
+{
+    "user_id": "test@mail.com",
+    "thumbnail_urls": [
+        "https://pixtag.s3.amazonaws.com/image23-thumb.png",
+        "https://pixtag.s3.amazonaws.com/image60-thumb.png"
+    ]
+}
+

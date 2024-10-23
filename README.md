@@ -19,4 +19,4 @@ libgthread-so: arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-libg
 
 pillow: arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p312-Pillow:2
    
-Thanks to Klayers for providing arns!!!🥰🥰🥰
+Thanks to Klayers for providing Python package arns!!!🥰🥰🥰
